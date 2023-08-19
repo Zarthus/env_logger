@@ -32,7 +32,7 @@ fn main() {
 - Timestamps are handled with chrono (if possible), and included by default
 - Opinionated colouring
 
-<img src="image/ascii.gif" width="1024">
+![image/ascii.gif](image/ascii.gif)
 
 ## License
 
