@@ -1,0 +1,22 @@
+[package]
+name = "zarthus_env_logger"
+version = "0.1.0"
+edition = "2021"
+keywords = ["logging", "env_logger", "zarthus"]
+authors = ["Zarthus <zarthus@liefland.net"]
+license = "MIT or APACHE-2"
+description = "A very opinionated logger"
+repository = "https://github.com/Zarthus/env_logger"
+readme = "README.md"
+publish = true
+
+[dependencies]
+env_logger = "0.10.0"
+log = "0.4.20"
+
+[dependencies.chrono]
+version = "0.4.26"
+optional = true
+
+[features]
+default = ["chrono"]
