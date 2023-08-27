@@ -1,6 +1,6 @@
 # zarthus_env_logger
 
-[![version](https://img.shields.io/crates/v/crawl?color=blue&logo=rust&style=flat-square)](https://crates.io/crates/zarthus_env_logger)
+[![version](https://img.shields.io/crates/v/zarthus_env_logger?color=blue&logo=rust&style=flat-square)](https://crates.io/crates/zarthus_env_logger)
 
 The most opinionated logger you'll find.
 
