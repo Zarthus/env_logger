@@ -3,22 +3,26 @@ use log::{Level, LevelFilter, Record};
 use std::env;
 
 pub fn init() {
-    init_custom(env!("CARGO_PKG_NAME"), LevelFilter::Debug, "%H:%M:%S")
+    init_custom(vec![env!("CARGO_PKG_NAME")], LevelFilter::Debug, "%H:%M:%S")
 }
 
 pub fn init_named(module_name: &'static str) {
-    init_custom(module_name, LevelFilter::Debug, "%H:%M:%S")
+    init_custom(vec![module_name], LevelFilter::Debug, "%H:%M:%S")
+}
+
+pub fn init_named_many(module_names: Vec<&'static str>) {
+    init_custom(module_names, LevelFilter::Debug, "%H:%M:%S")
 }
 
 pub fn init_custom(
-    module_name: &'static str,
+    module_names: Vec<&'static str>,
     level_filter: LevelFilter,
     timestamp_format: &'static str,
 ) {
     if std::env::var("RUST_LOG").is_ok() {
         env_logger::init();
     } else {
-        builder(module_name, level_filter, timestamp_format)
+        builder(&module_names, level_filter, timestamp_format)
     }
 }
 
@@ -30,14 +34,24 @@ pub fn init_custom(
 ///   timestamp_format: if the `chrono` feature is enabeld, format timestamps like this
 ///
 /// Does not return any value.
-fn builder(module_name: &'static str, level_filter: LevelFilter, timestamp_format: &'static str) {
-    env_logger::builder()
-        .filter_module(module_name, level_filter)
+fn builder(
+    module_names: &Vec<&'static str>,
+    level_filter: LevelFilter,
+    timestamp_format: &'static str,
+) {
+    let first_module_name = module_names.first().unwrap();
+
+    let mut builder = env_logger::builder();
+
+    for module_name in module_names {
+        builder.filter_module(module_name, level_filter);
+    }
+
+    builder
         .filter(None, LevelFilter::Error)
         .format_level(true)
-        .format(|buf, record| format(buf, record, module_name, timestamp_format))
-        .try_init()
-        .unwrap();
+        .format(|buf, record| format(buf, record, first_module_name, timestamp_format))
+        .init();
 
     log::trace!("RUST_LOG was not set, using self-built debug logger");
 }

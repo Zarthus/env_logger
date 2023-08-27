@@ -2,7 +2,7 @@
 extern crate log;
 
 fn main() {
-    zarthus_env_logger::init_custom(vec!["custom_init"], log::LevelFilter::Trace, "%H:%M:%S %Z");
+    zarthus_env_logger::init_named_many(vec!["many_names", "FOO", "BAR", "BAZ"]);
 
     trace!("Trace log!");
     debug!("Debug log!");

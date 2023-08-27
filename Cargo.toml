@@ -1,6 +1,6 @@
 [package]
 name = "zarthus_env_logger"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 keywords = ["logging", "env_logger", "zarthus"]
 authors = ["Zarthus <zarthus@liefland.net"]
