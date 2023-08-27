@@ -108,13 +108,13 @@ fn format_timestamp(ts: String, _timestamp_format: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::{builder, format, format_timestamp, init};
-    use env_logger::fmt::Formatter;
-    use log::Record;
+    use crate::{builder, format_timestamp};
 
     #[test]
     fn test_builder() {
-        builder("foo", log::LevelFilter::Error, "%H:M:%S");
+        let modules_names = vec!["foo"];
+
+        builder(&modules_names, log::LevelFilter::Error, "%H:M:%S");
     }
 
     // #[test]
