@@ -1,6 +1,6 @@
 [package]
 name = "zarthus_env_logger"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 keywords = ["logging", "env_logger", "zarthus"]
 authors = ["Zarthus <zarthus@liefland.net"]
@@ -16,6 +16,11 @@ log = "0.4.20"
 
 [dependencies.chrono]
 version = "0.4.31"
+optional = true
+
+[dependencies.time]
+version = "0.3.31"
+features = ["macros", "formatting", "parsing"]
 optional = true
 
 [features]

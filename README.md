@@ -29,7 +29,7 @@ fn main() {
 - Absolutely nothing if `RUST_LOG` is set.
 - The name of the package is shortened (to `@`)
 - Log filters to `debug` by default for your own package, and `error` for all other packages.
-- Timestamps are handled with chrono (if possible), and included by default
+- Timestamps are handled with `chrono` or `time` (if possible), and included by default
 - Opinionated colouring
 
 ![image/ascii.gif](image/ascii.gif)

@@ -11,8 +11,7 @@ env:
   RUST_BACKTRACE: short
 
 jobs:
-
-  build:
+  chrono:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,11 +20,35 @@ jobs:
         uses: Swatinem/rust-cache@v2
       - name: Build
         run: cargo build --verbose
-      - name: Lint
-        uses: giraffate/clippy-action@v1
       - name: Tests
         run: cargo test --verbose
+      - name: Lint
+        uses: giraffate/clippy-action@v1
       - name: Cargo check
         run: cargo check
-      - name: Build (no features)
+
+  time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup | Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --verbose --no-default-features --features="time"
+      - name: Tests
+        run: cargo test --no-default-features --features="time" --verbose
+      - name: Lint
+        uses: giraffate/clippy-action@v1
+      - name: Cargo check
+        run: cargo check
+
+  no_features:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup | Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build
         run: cargo build --verbose --no-default-features

@@ -2,16 +2,20 @@ use env_logger::fmt::{Color, Formatter};
 use log::{Level, LevelFilter, Record};
 use std::env;
 
+#[cfg(all(feature = "chrono", feature = "time"))]
+// You will want to either `--no-default-features --features="time"` or not enable the time feature to default to chrono.
+compile_error!("Feature 'chrono' and 'time' are mutually exclusive and cannot be enabled together");
+
 pub fn init() {
-    init_custom(vec![env!("CARGO_PKG_NAME")], LevelFilter::Debug, "%H:%M:%S")
+    init_custom(vec![env!("CARGO_PKG_NAME")], LevelFilter::Debug, timestamp_format())
 }
 
 pub fn init_named(module_name: &'static str) {
-    init_custom(vec![module_name], LevelFilter::Debug, "%H:%M:%S")
+    init_custom(vec![module_name], LevelFilter::Debug, timestamp_format())
 }
 
 pub fn init_named_many(module_names: Vec<&'static str>) {
-    init_custom(module_names, LevelFilter::Debug, "%H:%M:%S")
+    init_custom(module_names, LevelFilter::Debug, timestamp_format())
 }
 
 pub fn init_custom(
@@ -19,7 +23,7 @@ pub fn init_custom(
     level_filter: LevelFilter,
     timestamp_format: &'static str,
 ) {
-    if std::env::var("RUST_LOG").is_ok() {
+    if env::var("RUST_LOG").is_ok() {
         env_logger::init();
     } else {
         builder(&module_names, level_filter, timestamp_format)
@@ -31,7 +35,7 @@ pub fn init_custom(
 /// params:
 ///   module_name: the name of the package
 ///   level_filter: the level to filter for your package
-///   timestamp_format: if the `chrono` feature is enabeld, format timestamps like this
+///   timestamp_format: if the `chrono` or `time` feature is enabled, format timestamps like this
 ///
 /// Does not return any value.
 fn builder(
@@ -94,21 +98,42 @@ fn format(
     )
 }
 
-#[cfg(feature = "chrono")]
+fn timestamp_format() -> &'static str {
+    #[cfg(feature = "time")]
+    return "[hour]:[minute]:[second]";
+    #[cfg(not(feature = "time"))]
+    "%H:%M:%S"
+}
+#[cfg(all(feature = "chrono", not(feature = "time")))]
 fn format_timestamp(ts: String, timestamp_format: &str) -> String {
     chrono::DateTime::parse_from_rfc3339(&ts)
         .map(|dt| dt.format(timestamp_format).to_string())
         .unwrap_or_else(|_| ts)
 }
 
-#[cfg(not(feature = "chrono"))]
+#[cfg(all(feature = "time", not(feature = "chrono")))]
+fn format_timestamp(ts: String, timestamp_format: &str) -> String {
+    use ::time::OffsetDateTime;
+    use ::time::format_description::well_known::Rfc3339;
+
+    let fmt = ::time::format_description::parse(timestamp_format).unwrap();
+
+    let parsed_result = OffsetDateTime::parse(&ts, &Rfc3339);
+    match parsed_result {
+        Ok(parsed) => return parsed.format(&fmt).unwrap_or_else(|_| ts),
+        Err(_) => ts,
+    }
+}
+
+#[cfg(all(not(feature = "chrono"), not(feature = "time")))]
 fn format_timestamp(ts: String, _timestamp_format: &str) -> String {
     ts
 }
 
+
 #[cfg(test)]
 mod tests {
-    use crate::{builder, format_timestamp};
+    use crate::{builder, format_timestamp, timestamp_format};
 
     #[test]
     fn test_builder() {
@@ -133,22 +158,24 @@ mod tests {
     //     assert_eq!("Foo", output)
     // }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(any(feature = "chrono", feature = "time"))]
     #[test]
     fn test_format_timestamp() {
+        let fmt = timestamp_format();
+
         assert_eq!(
-            "20:05:05 2023 +02:00",
-            format_timestamp("2023-12-31T20:05:05+02:00".to_string(), "%H:%M:%S %Y %Z"),
+            "20:05:05",
+            format_timestamp("2023-12-31T20:05:05+02:00".to_string(), fmt),
         );
     }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(any(feature = "chrono", feature = "time"))]
     #[test]
     fn test_format_timestamp_crashes_on_bad_format() {
         assert_eq!("", format_timestamp("".to_string(), "%9 ABC"));
     }
 
-    #[cfg(not(feature = "chrono"))]
+    #[cfg(all(not(feature = "chrono"), not(feature = "time")))]
     #[test]
     fn test_format_timestamp() {
         assert_eq!(
