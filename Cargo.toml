@@ -19,7 +19,7 @@ version = "0.4.31"
 optional = true
 
 [dependencies.time]
-version = "0.3.31"
+version = "0.3.32"
 features = ["macros", "formatting", "parsing"]
 optional = true
 
