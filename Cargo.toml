@@ -15,7 +15,7 @@ env_logger = "0.10.1"
 log = "0.4.20"
 
 [dependencies.chrono]
-version = "0.4.31"
+version = "0.4.37"
 optional = true
 
 [dependencies.time]
